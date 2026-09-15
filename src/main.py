@@ -81,6 +81,30 @@ while running:
 
     player.draw(screen, camera.position)
 
+    # ------- Camada de escuridão
+    darkness = pygame.Surface(
+        (WIDTH, HEIGHT),
+        pygame.SRCALPHA)
+
+    darkness.fill((0, 0, 0, 255))
+
+    light_position = (
+        int(player.position.x - camera.position.x),
+        int(player.position.y - camera.position.y)
+    )
+
+    pygame.draw.circle(
+        darkness,
+        (0, 0, 0, 155),
+        light_position,
+        player.light.radius
+    )
+
+    screen.blit(
+        darkness,
+        (0, 0)
+    )
+
     # Update the display
     pygame.display.flip()
 

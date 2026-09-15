@@ -33,7 +33,7 @@ class Maze:
                     )
                 )
     
-    def collides_with_cicrle(self, position, radius):
+    def collides_with_circle(self, position, radius):
         for row_index, row in enumerate(self.layout):
             for column_index, cell in enumerate(row):
                 if cell != '#':
