@@ -1,25 +1,28 @@
 import pygame
 
+from entities.player import Player
+from camera import Camera
+from grid import draw_grid
+
 pygame.init()
 
 # Set up the display
 HEIGHT = 600
 WIDTH = 800
 
-clock = pygame.time.Clock()
-print(f"Starting the game... {clock}")
+WORLD_WIDTH = 2000
+WORLD_HEIGHT = 1200
 
-player = {
-    "x": WIDTH // 2,
-    "y": HEIGHT // 2,
-    "radius": 30,
-    "speed": 300,
-    "color": (255, 255, 255)  # White color
-}
+clock = pygame.time.Clock()
+print(f"Starting the game...")
 
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Mazze")
+
+player = Player((WORLD_WIDTH // 2, WORLD_HEIGHT // 2))
+camera = Camera(WIDTH, HEIGHT)
+
 
 running = True
 
@@ -31,32 +34,40 @@ while running:
     
     # --- Delta Time
     dt = clock.tick(60) / 1000
-    keys = pygame.key.get_pressed()
-
-    if keys[pygame.K_a]:
-        player['x'] -= player['speed'] * dt 
     
-    if keys[pygame.K_s]:
-        player['y'] -= player['speed'] * dt 
+    player.update(dt)
     
-    if keys[pygame.K_z]:
-        player['y'] += player['speed'] * dt 
-    
-    if keys[pygame.K_x]:
-        player['x'] += player['speed'] * dt 
-
-    
-    screen.fill((0, 0, 0))
-    
-    pygame.draw.circle(
-        screen,
-        (255, 255, 255),
-        (int(player['x']), int(player['y'])),
-        player['radius']
+    # Limites do Jogador
+    player.position.x = max(
+        player.radius, 
+        min(WORLD_WIDTH - player.radius, player.position.x)
         )
 
-    # Fill the screen with a color (e.g., white)
+    player.position.y = max(
+        player.radius, 
+        min(WORLD_HEIGHT - player.radius, player.position.y)
+        )
+
     
+    camera.update(
+        player.position,
+        WORLD_WIDTH,
+        WORLD_HEIGHT
+    )
+    
+    # ----------- Renderizando os objetos na tela
+    screen.fill((0, 0, 0))
+
+    draw_grid(
+        screen,
+        camera,
+        WORLD_WIDTH,
+        WORLD_HEIGHT,
+        HEIGHT,
+        WIDTH
+    )
+
+    player.draw(screen, camera.position)
 
     # Update the display
     pygame.display.flip()
