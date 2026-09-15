@@ -2,16 +2,31 @@ import pygame
 
 from entities.player import Player
 from camera import Camera
+from maze.maze import Maze
+from maze.mazes import mazes, set_cell_size
 from grid import draw_grid
 
 pygame.init()
 
+
+# --- Inicializando os objetos
+
+
+
+
+maze = Maze(
+    mazes(),
+    set_cell_size()
+)
+
 # Set up the display
+
 HEIGHT = 600
 WIDTH = 800
 
-WORLD_WIDTH = 2000
-WORLD_HEIGHT = 1200
+WORLD_WIDTH = maze.width * set_cell_size()
+WORLD_HEIGHT = maze.height * set_cell_size()
+
 
 clock = pygame.time.Clock()
 print(f"Starting the game...")
@@ -21,6 +36,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Mazze")
 
 player = Player((WORLD_WIDTH // 2, WORLD_HEIGHT // 2))
+
 camera = Camera(WIDTH, HEIGHT)
 
 
@@ -35,7 +51,7 @@ while running:
     # --- Delta Time
     dt = clock.tick(60) / 1000
     
-    player.update(dt)
+    player.update(dt, maze)
     
     # Limites do Jogador
     player.position.x = max(
@@ -58,13 +74,9 @@ while running:
     # ----------- Renderizando os objetos na tela
     screen.fill((0, 0, 0))
 
-    draw_grid(
+    maze.draw(
         screen,
-        camera,
-        WORLD_WIDTH,
-        WORLD_HEIGHT,
-        HEIGHT,
-        WIDTH
+        camera.position
     )
 
     player.draw(screen, camera.position)
