@@ -7,6 +7,8 @@ class Maze:
 
         self.width = len(layout[0])
         self.height = len(layout)
+
+        self.walls = self._build_walls()
     
     def draw(self, surface, camera_position):
         for row_index, row in enumerate(self.layout):
@@ -64,3 +66,46 @@ class Maze:
                     return True
         
         return False
+    
+    def _build_walls(self):
+
+        walls = []
+
+        for row_index, row in enumerate(self.layout):
+            for column_index, cell in enumerate(row):
+
+                if cell != '#':
+                    continue
+
+                wall_rect = pygame.Rect(
+                    column_index * self.cell_size,
+                    row_index * self.cell_size,
+                    self.cell_size,
+                    self.cell_size
+                )
+
+                walls.append(wall_rect)
+        
+        return walls
+    
+    def raycast(self, start, end):
+        closest_point = None
+        closest_distance_squared = float('inf')
+
+        for wall in self.walls:
+            clipped_line = wall.clipline(start, end)
+
+            if not clipped_line:
+                continue
+
+            for point in clipped_line:
+                distance_squared = start.distance_squared_to(point)
+
+                if distance_squared < closest_distance_squared:
+                    closest_distance_squared = distance_squared
+                    closest_point = pygame.Vector2(point)
+        
+        if closest_point is None:
+            return pygame.Vector2(end)
+        
+        return closest_point

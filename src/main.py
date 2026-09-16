@@ -81,29 +81,100 @@ while running:
 
     player.draw(screen, camera.position)
 
+
+    visibility_points = player.light.calculate_visibility(
+        player.position,
+        maze
+    )
+
+    screen_points = []
+    for light_data in visibility_points:
+
+        points = light_data['position']
+        intensity = light_data['intensity']
+
+        screen_point = points - camera.position
+        screen_points.append({
+            'position': 
+            (int(screen_point.x),
+            int(screen_point.y)),
+            'intensity': intensity
+        })
+    
+    
+
     # ------- Camada de escuridão
     darkness = pygame.Surface(
         (WIDTH, HEIGHT),
         pygame.SRCALPHA)
+    
+    light_gradient = pygame.Surface(
+        (WIDTH, HEIGHT),
+        pygame.SRCALPHA
+    )
+    
+    # ------- Camada de máscara de luz
+    polygon_points = []
 
-    darkness.fill((0, 0, 0, 255))
+    for light_data in screen_points:
+        polygon_points.append(light_data['position'])
+
+    light_mask = pygame.Surface(
+        (WIDTH, HEIGHT),
+        pygame.SRCALPHA
+    )
+
+    light_mask.fill((0, 0, 0, 0))
+
+    if len(polygon_points) >= 3:
+        pygame.draw.polygon(
+            light_mask,
+            (255, 255, 255, 255),
+            polygon_points
+        )
+    
+    # -------------------------------------
+
+    light_gradient.fill((0, 0, 0, 0))
 
     light_position = (
         int(player.position.x - camera.position.x),
         int(player.position.y - camera.position.y)
     )
 
-    pygame.draw.circle(
-        darkness,
-        (0, 0, 0, 155),
-        light_position,
-        player.light.radius
+    radius = int(player.light.current_radius)
+
+    for current_radius in range(radius, 0, -2):
+        intensity = player.light.get_intensity(current_radius)
+
+        alpha = int(255 * intensity)
+
+        pygame.draw.circle(
+            light_gradient,
+            (0, 0, 0, alpha),
+            light_position,
+            current_radius
+        )
+
+    darkness.fill((0, 0, 0, 255))
+
+    light_gradient.blit(
+        light_mask,
+        (0, 0),
+        special_flags=pygame.BLEND_RGBA_MIN
+    )
+
+    darkness.blit(
+        light_gradient,
+        (0, 0),
+        special_flags=pygame.BLEND_RGBA_SUB
     )
 
     screen.blit(
         darkness,
         (0, 0)
     )
+
 
     # Update the display
     pygame.display.flip()
