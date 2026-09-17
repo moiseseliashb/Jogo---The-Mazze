@@ -14,7 +14,7 @@ class Light:
 
 
         # --- Dados para o efeito pulsação
-        self.base_radius = 180
+        self.base_radius = 130
         self.pulse_amount = 6
         self.pulse_speed = 1.8
         self.time = 0.0
