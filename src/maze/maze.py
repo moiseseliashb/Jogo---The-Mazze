@@ -87,7 +87,6 @@ class Maze:
 
                 walls.append(wall_rect)
         
-        print('Feito')
         return walls
     
     def raycast(self, start, end):
@@ -166,17 +165,11 @@ class Maze:
             if self.is_mutable(row, column):
                 valid_cells.append((row, column))
 
-                print(f'Linha {row} e Coluna {column}, validas...')
         
         for row, column in valid_cells:
-            print(f'Valor antigo: {self.layout[row][column]}')
-            print(f'Valor novo: {value}')
-
             self.layout[row][column] = value
-            print(f'Linha {row} e Coluna {column}, mudadas')
 
         if valid_cells:
-            print('Validas')
             self._rebuild_walls()
     
 
@@ -195,5 +188,4 @@ class Maze:
     
 
     def _rebuild_walls(self):
-        print('Aletaração em andamento...')
         self.walls = self._build_walls()

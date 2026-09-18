@@ -31,13 +31,13 @@ class LightingRenderer:
             special_flags=pygame.BLEND_RGBA_MIN
         )
 
-        """ self.darkness.blit(
+        self.darkness.blit(
             self.light_gradient,
             (0, 0),
             special_flags=pygame.BLEND_RGBA_SUB
-        ) """
+        )
 
-        self.screen.blit(self.light_gradient,(0, 0))
+        self.screen.blit(self.darkness, (0, 0))
 
     def _render_visibility(self, light, light_position):
         visibility_points = light.calculate_visibility(

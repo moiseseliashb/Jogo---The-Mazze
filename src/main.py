@@ -23,7 +23,11 @@ maze = Maze(
     set_cell_size()
 )
 
-mutation = MazeMutation(maze)
+mutation = MazeMutation(
+    maze,
+    mutation_interval=3.0,
+    player_safe_radius=150
+    )
 
 # Set up the display
 
@@ -55,19 +59,13 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        
-        if event.type == pygame.KEYDOWN:
-
-            if event.key == pygame.K_m:
-                mutation.open_cells([
-                    (1, 7)
-                ])
 
     
     # --- Delta Time
     dt = clock.tick(60) / 1000
     
     player.update(dt, maze)
+    mutation.update(dt, player.position)
     
     # Limites do Jogador
     player.position.x = max(
