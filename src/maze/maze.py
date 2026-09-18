@@ -2,7 +2,8 @@ import pygame
 
 class Maze:
     def __init__(self, layout, cell_size):
-        self.layout = layout
+        self.layout = [list(row) for row in layout]
+
         self.cell_size = cell_size
 
         self.width = len(layout[0])
@@ -86,6 +87,7 @@ class Maze:
 
                 walls.append(wall_rect)
         
+        print('Feito')
         return walls
     
     def raycast(self, start, end):
@@ -109,3 +111,89 @@ class Maze:
             return pygame.Vector2(end)
         
         return closest_point
+
+    
+    
+    # ----- Mutação ------------
+    def is_wall(self, row, column):
+        if not self.is_valid_cell(row, column):
+            return False
+        
+        return self.layout[row][column] == '#'
+    
+    def is_open(self, row, column):
+        if not self.is_valid_cell(row, column):
+            return False
+        
+        return self.layout[row][column] != '#'
+    
+    def is_valid_cell(self, row, column):
+        return (
+            0 <= row < self.height
+            and
+            0 <= column < self.width
+        )
+
+    def is_mutable(self, row, column):
+            if not self.is_valid_cell(row, column):
+                return False
+            
+            if row == 0 or row == self.height - 1:
+                return False
+            
+            if column == 0 or column == self.width - 1:
+                return False
+            
+            return True
+    
+    def set_cell(self, row, column, value):
+        if value not in ('#', '.'):
+            return
+
+        if not self.is_mutable(row, column):
+            return
+
+        self.layout[row][column] = value
+        self._rebuild_walls()
+    
+    def set_cells(self, cells, value):
+        if value not in ('#', '.'):
+            return
+
+        valid_cells = []
+
+        for row, column in cells:
+            if self.is_mutable(row, column):
+                valid_cells.append((row, column))
+
+                print(f'Linha {row} e Coluna {column}, validas...')
+        
+        for row, column in valid_cells:
+            print(f'Valor antigo: {self.layout[row][column]}')
+            print(f'Valor novo: {value}')
+
+            self.layout[row][column] = value
+            print(f'Linha {row} e Coluna {column}, mudadas')
+
+        if valid_cells:
+            print('Validas')
+            self._rebuild_walls()
+    
+
+    def mutate_cells(self, cells, value):
+        mutable_cells = []
+
+        for row, column in cells:
+            if self.is_mutable(row, column):
+                mutable_cells.append((row, column))
+        
+        if not mutable_cells:
+            return
+
+        
+        self.set_cells(mutable_cells, value)
+    
+
+    def _rebuild_walls(self):
+        print('Aletaração em andamento...')
+        self.walls = self._build_walls()

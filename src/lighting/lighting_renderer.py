@@ -3,10 +3,9 @@ import pygame
 
 class LightingRenderer:
     # player_position,
-    def __init__(self, screen, player, maze, camera):
+    def __init__(self, screen, maze, camera):
 
         self.screen = screen
-        self.player = player
         # self.player_position = player_position,
         self.maze = maze
         self.camera = camera
@@ -14,11 +13,17 @@ class LightingRenderer:
         self.light_mask = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
         self.light_gradient = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
 
-    def render(self):
+    def render(self, light, light_position):
         self.darkness.fill((0, 0, 0, 255))
 
-        self._render_visibility()
-        self._render_gradient()
+        self._render_visibility(
+            light,
+            light_position
+        )
+        self._render_gradient(
+            light,
+            light_position
+        )
 
         self.light_gradient.blit(
             self.light_mask,
@@ -26,17 +31,17 @@ class LightingRenderer:
             special_flags=pygame.BLEND_RGBA_MIN
         )
 
-        self.darkness.blit(
+        """ self.darkness.blit(
             self.light_gradient,
             (0, 0),
             special_flags=pygame.BLEND_RGBA_SUB
-        )
+        ) """
 
-        self.screen.blit(self.darkness, (0, 0))
+        self.screen.blit(self.light_gradient,(0, 0))
 
-    def _render_visibility(self):
-        visibility_points = self.player.light.calculate_visibility(
-            self.player.position,
+    def _render_visibility(self, light, light_position):
+        visibility_points = light.calculate_visibility(
+            light_position,
             self.maze
         )
 
@@ -55,20 +60,20 @@ class LightingRenderer:
 
         return self.light_mask
 
-    def _render_gradient(self):
+    def _render_gradient(self, light, light_position):
         self.light_gradient.fill((0, 0, 0, 0))
 
-        light_position = self._to_screen_position(self.player.position)
-        radius = int(self.player.light.current_radius)
+        screen_light_position = self._to_screen_position(light_position)
+        radius = int(light.current_radius)
 
         for current_radius in range(radius, 0, -2):
-            intensity = self.player.light.get_intensity(current_radius)
+            intensity = light.get_intensity(current_radius)
             alpha = int(255 * intensity)
 
             pygame.draw.circle(
                 self.light_gradient,
                 (0, 0, 0, alpha),
-                light_position,
+                screen_light_position,
                 current_radius
             )
 

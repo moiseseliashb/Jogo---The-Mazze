@@ -14,9 +14,9 @@ class Light:
 
 
         # --- Dados para o efeito pulsação
-        self.base_radius = 130
+        self.base_radius = 100
         self.pulse_amount = 6
-        self.pulse_speed = 1.8
+        self.pulse_speed = 2
         self.time = 0.0
         self.current_radius = self.base_radius
 
@@ -41,13 +41,6 @@ class Light:
         self.energy = max(0, self.energy)
 
         point = pygame.Vector2(90, 0)
-
-        """ print(
-        self.get_light_data(
-            pygame.Vector2(0, 0),
-            point
-        )
-        ) """
 
     def calculate_visibility(self, position, maze):
         points = []

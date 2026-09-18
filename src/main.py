@@ -4,6 +4,9 @@ from entities.player import Player
 from camera import Camera
 from maze.maze import Maze
 from maze.mazes import generate_maze, set_cell_size
+
+from maze.maze_mutation import MazeMutation
+
 from grid import draw_grid
 from lighting.lighting_renderer import LightingRenderer
 
@@ -19,6 +22,8 @@ maze = Maze(
     generate_maze(),
     set_cell_size()
 )
+
+mutation = MazeMutation(maze)
 
 # Set up the display
 
@@ -40,7 +45,7 @@ player = Player((WORLD_WIDTH // 2, WORLD_HEIGHT // 2))
 
 camera = Camera(WIDTH, HEIGHT)
 
-lighting_renderer = LightingRenderer(screen, player, maze, camera)
+lighting_renderer = LightingRenderer(screen, maze, camera)
 
 
 
@@ -50,6 +55,13 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_m:
+                mutation.open_cells([
+                    (1, 7)
+                ])
 
     
     # --- Delta Time
@@ -83,7 +95,10 @@ while running:
     )
 
     player.draw(screen, camera.position)
-    lighting_renderer.render()
+    lighting_renderer.render(
+        player.light,
+        player.position
+    )
 
     # Update the display
     pygame.display.flip()
